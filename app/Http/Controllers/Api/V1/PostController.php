@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
     /**
@@ -14,7 +15,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('author')->get();
+        $user = auth()->user();
+        $posts = $user->posts()->with('author')->paginate(10);
+
         return response()->json([
             "message" => "Post List",
             'data' => PostResource::collection($posts)
@@ -28,7 +31,7 @@ class PostController extends Controller
     {
         $data = $request->validated();
 
-        $data['author_id'] = 2;
+        $data['author_id'] = $request->user()->id;
         $post = Post::create($data);
         return response()->json([
             'message' => 'New post created successfully.',
@@ -41,6 +44,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        abort_if(Auth::id() != $post->author_id, 403, "Access forbiden");
         return response()->json(new PostResource($post), 200);
     }
 
@@ -49,10 +53,14 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-         $data = $request->validate([
+        abort_if(Auth::id() != $post->author_id, 403, "Access forbiden");
 
+        $data = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
         ]);
 
+        dd($data);
         $post->update($data);
         return response()->json([
             'message' => 'post updated successfully.',
@@ -65,6 +73,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+
+        abort_if(Auth::id() != $post->author_id, 403, "Access forbiden");
         $post->delete();
         return response()->noContent();
     }
