@@ -13,14 +13,48 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
-        $posts = $user->posts()->with('author')->paginate(10);
+        $query = $user->posts()->with('author');
 
+           // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('title', 'LIKE', '%' . $request->search . '%');
+        }
+
+        // Apply sorting
+        $allowedSortFields = ['created_at', 'title', 'body', 'updated_at'];
+        $sortField = 'created_at';
+        $sortDirection = 'desc';
+
+        if ($request->has('sort') && !empty($request->sort)) {
+            $sort = $request->sort;
+            if (str_starts_with($sort, '-')) {
+                $sortField = substr($sort, 1);
+                $sortDirection = 'desc';
+            } else {
+                $sortField = $sort;
+                $sortDirection = 'asc';
+            }
+        }
+
+        // Validate sort field
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'created_at';
+            $sortDirection = 'desc';
+        }
+
+        $query->orderBy($sortField, $sortDirection);
+        $posts = $query->paginate($request->get('per_page', 15));
         return response()->json([
-            "message" => "Post List",
-            'data' => PostResource::collection($posts)
+            'data' => PostResource::collection($posts),
+            'meta' => [
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'per_page' => $posts->perPage(),
+                'total' => $posts->total(),
+            ],
         ], 200);
     }
 
@@ -60,7 +94,7 @@ class PostController extends Controller
             'body' => 'required'
         ]);
 
-        dd($data);
+
         $post->update($data);
         return response()->json([
             'message' => 'post updated successfully.',
