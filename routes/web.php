@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GoogleAuthController;
-Route::get('/test', function () {
+Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
@@ -11,3 +11,4 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 
 
 require __DIR__.'/auth.php';
+

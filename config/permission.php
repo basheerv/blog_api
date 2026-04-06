@@ -198,5 +198,8 @@ return [
          */
 
         'store' => 'default',
+        'defaults' => [
+            'guard' => 'sanctum',   // ← change this if it says 'web'
+        ],
     ],
 ];

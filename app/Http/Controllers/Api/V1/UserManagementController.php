@@ -20,13 +20,13 @@ class UserManagementController extends Controller
         if ($request->has('search') && !empty($request->search)) {
             $query->where('name', 'LIKE', '%' . $request->search . '%');
         }
-
+        $query->with('roles');
         $query->orderBy('created_at', 'desc');
         $users = $query->paginate(10);
         return response()->json($users, 200);
     }
 
-    public function edit(User $user)
+    public function show(User $user)
     {
         $roles = Role::pluck('name');
         return response()->json(['user' => $user, 'roles' => $roles], 200);

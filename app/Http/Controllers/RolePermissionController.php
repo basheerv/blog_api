@@ -28,7 +28,7 @@ class RolePermissionController extends Controller
           'permissions.*' => 'exists:permissions,name'
         ]);
 
-        $role = Role::create(['name' => $request->roleName, 'guard_name' => 'web']);
+        $role = Role::create(['name' => $request->roleName, 'guard_name' => 'sanctum']);
         $role->syncPermissions($request->permissions);
 
         if (!empty($request->permissions)) {

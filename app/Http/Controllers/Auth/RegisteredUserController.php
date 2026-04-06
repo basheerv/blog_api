@@ -27,6 +27,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -37,7 +38,8 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->string('password')),
         ]);
 
-        $user->assignRole($request->role);
+        $role = Role::find($request->role);
+        $user->assignRole($role);
 
         event(new Registered($user));
 

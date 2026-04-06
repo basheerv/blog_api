@@ -19,7 +19,15 @@ class RolePermissionSeeder extends Seeder
             'users.edit',
             'users.delete',
             'users.view',
-            'view.dashboard'
+            'view.dashboard',
+            'roles.manage',
+            'roles.view',
+            'permissions.manage',
+            'permissions.view',
+            'categories.create',
+            'categories.edit',
+            'categories.delete',
+            'categories.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -34,12 +42,21 @@ class RolePermissionSeeder extends Seeder
 
         $merchantRole->syncPermissions([
             'users.view',
-            'view.dashboard'
+            'view.dashboard',
+            'roles.manage',
+            'roles.view',
+            'permissions.manage',
+            'permissions.view',
+            'categories.create',
+            'categories.edit',
+            'categories.delete',
+            'categories.view',
         ]);
 
         $userRole->syncPermissions([
             'users.view',
-            'view.dashboard'
+            'view.dashboard',
+            'categories.view',
         ]);
     }
 }

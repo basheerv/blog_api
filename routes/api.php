@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\ImageGenerationController;
 use App\Http\Controllers\Api\V1\UserManagementController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\RolePermissionController;
 
 use Laravel\Socialite\Socialite;
@@ -19,8 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
    });
 
-   Route::apiResource('/users', UserManagementController::class)->only(['index'])->middleware('permission:users.view');
-   Route::apiResource('/users', UserManagementController::class)->only(['edit','update'])->middleware('permission:users.edit');
+   Route::apiResource('/users', UserManagementController::class);
 
    Route::get('/permissions/sync-roles', [RolePermissionController::class, 'syncRoles']);
    Route::apiResource('/permissions', RolePermissionController::class);
@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::get('/roles/list', [RolePermissionController::class, 'roleList']);
 
    Route::prefix('v1')->group(function () {
+    Route::apiResource('/categories', CategoryController::class);
+    Route::post('/categories/update/{category_id}', [CategoryController::class, 'update_category']);
     Route::apiResource('posts', PostController::class);
     Route::apiResource('image-generation', ImageGenerationController::class)->only(['index', 'store']);
    });
