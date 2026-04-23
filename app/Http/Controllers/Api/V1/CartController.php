@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\CartItem;
-
+use App\Http\Requests\CartRequest;
 class CartController extends Controller
 {
     /**
@@ -26,21 +26,13 @@ class CartController extends Controller
 
     }
 
-    public function store(Request $request)
+    public function store(CartRequest $request)
     {
-        $request->validate([
-            'item_id'              => 'required|exists:items,id',
-            'quantity'             => 'required|integer|min:1',
-            'price'                => 'required|numeric',
-            'total_price'          => 'required|numeric',
-        ]);
 
-        // ✅ one line — find active cart or create it
         $cart = Cart::firstOrCreate(
             ['user_id' => $request->user()->id, 'status' => 'active']
         );
 
-        // ✅ no duplicate rows — adds quantity if item already in cart
         $cartItem = CartItem::updateOrCreate(
             [
                 'cart_id' => $cart->id,
