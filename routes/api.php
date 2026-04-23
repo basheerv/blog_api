@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\ImageGenerationController;
 use App\Http\Controllers\Api\V1\UserManagementController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ItemController;
+use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\RolePermissionController;
 
 use Laravel\Socialite\Socialite;
@@ -30,8 +32,12 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::prefix('v1')->group(function () {
     Route::apiResource('/categories', CategoryController::class);
     Route::post('/categories/update/{category_id}', [CategoryController::class, 'update_category']);
-    Route::apiResource('posts', PostController::class);
-    Route::apiResource('image-generation', ImageGenerationController::class)->only(['index', 'store']);
+    Route::get('/categories/items/{category_id}', [CategoryController::class, 'category_items']);
+    Route::apiResource('/items', ItemController::class);
+    Route::post('/items/update/{item_id}', [ItemController::class, 'update_item']);
+    Route::apiResource('/posts', PostController::class);
+    Route::apiResource('/carts', CartController::class);
+    Route::apiResource('/image-generation', ImageGenerationController::class)->only(['index', 'store']);
    });
 });
 

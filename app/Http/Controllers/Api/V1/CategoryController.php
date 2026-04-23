@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Item;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -14,7 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::where('status', 'publish')->get();
         return response()->json($categories);
     }
 
@@ -168,5 +169,28 @@ class CategoryController extends Controller
         return response()->json([
             'message' => 'Category updated successfully',
         ], 201);
+    }
+
+    public function category_items(string $id)
+    {
+       $category = Category::where(['id' => $id, 'status' => 'publish'])
+            ->with(['items' => function ($query) {
+                $query->where('status', 'publish');
+            }])
+            ->first();
+
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        // Access items directly from the relationship
+        $items = $category->items()
+            ->where('status', 'publish')
+            ->paginate(10);
+
+        return response()->json([
+            'category' => $category->name,
+            'items' => $items
+        ]);
     }
 }
